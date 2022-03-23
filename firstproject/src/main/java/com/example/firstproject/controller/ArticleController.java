@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -20,6 +21,28 @@ public class ArticleController {
     @Autowired
     private ArticleRepository articleRepository;
 
+
+    // 1. 샘플로 -> 테스트 데이터를 자동으로 입력 해보기
+    @GetMapping("/articles/inputData")
+    public String createMethod() {
+//        ArticleForm form = new ArticleForm(1L, "하나", "하나 내용");
+//        log.info("DTO : " + form.toString());
+
+        log.info("출력 여부");
+        ArticleForm form = null ;
+        int cnt = 10;
+
+        for (int i =0 ; i<= cnt ; i ++){
+            Long k = Long.valueOf(i);
+            form = new ArticleForm(k, "제목 : " + k , "내용 : " + k);
+            Article articleEntity = form.toEntity();
+            log.info("ENTITY : " + articleEntity.toString());
+            Article saved = articleRepository.save(articleEntity);
+            log.info("REPOSITORY : " + saved.toString());
+        }
+        return "redirect:/articles/"; // 상세페이지
+    }
+
     // 1. 받을 url 을 정의 한다.
     // 2. 받은 url 을 new templates 에 전달 한다.
     // 3. 입력창 화면  new.mustache 를 화면에 리턴한다.
@@ -28,16 +51,6 @@ public class ArticleController {
         return "articles/new";
     }
 
-    // 1. news/Form 화면에서 던진 acition = "articles/create"  내용을 받는다 .
-    // 2, DTO class 파일을 만든다. <form> 의 name 속성과 필드명이 같아야 한다.
-    // 3, DTO 파라미터를 createMethod 에 통과하게 한다.
-    // 4, 받은 DTO 내용을 로그에 찍어 본다.
-    @PostMapping("/articles/createlog")
-    public String createMethod(ArticleForm articleForm) {
-        System.out.println("test_starting" + articleForm.toString());
-
-        return "";
-    }
 
     // 1. news/Form 화면에서 던진 acition = "articles/create"  내용을 받는다 .
     // 2, DTO class 파일을 만든다. <form> 의 name 속성과 필드명이 같아야 한다.
@@ -56,20 +69,20 @@ public class ArticleController {
 
         Article articleEntity = form.toEntity();
 //        System.out.println("ENTITY : " +articleEntity.toString());
-        log.info("ENTITY : " +articleEntity.toString());
+        log.info("ENTITY : " + articleEntity.toString());
 
         Article saved = articleRepository.save(articleEntity);
 //        System.out.println("REPOSITORY : " +saved.toString());
-        log.info("REPOSITORY : " +saved.toString());
-        log.debug("REPOSITORY debug : " +saved.toString());
+        log.info("REPOSITORY : " + saved.toString());
+        log.debug("REPOSITORY debug : " + saved.toString());
 
         return "redirect:/articles/" + saved.getId(); // 상세페이지
     }
 
     // 1. detail 페이지 만들기 ,
     @GetMapping("/articles/{id}")
-    public String show(@PathVariable Long id, Model model){
-        log.info("id : {} " , id);
+    public String show(@PathVariable Long id, Model model) {
+        log.info("id : {} ", id);
 
         // 1, id로 데이터를 가져옴
         //    Optional<Article> articleEntity = articleRepository.findById(id);  // java 8 버전
@@ -84,7 +97,7 @@ public class ArticleController {
 
 
     @GetMapping("/articles")
-    public String index(Model model){
+    public String index(Model model) {
         // 1: 모든 article을 가져온다
         List<Article> articleEntityList = articleRepository.findAll();
 
@@ -97,7 +110,7 @@ public class ArticleController {
 
 
     @GetMapping("/articles/{id}/edit")
-    public String edit(@PathVariable Long id, Model model){
+    public String edit(@PathVariable Long id, Model model) {
         // 수정할 데이터 가져오기
         Article articleEntity = articleRepository.findById(id).orElse(null);
 
@@ -109,7 +122,7 @@ public class ArticleController {
     }
 
     @PostMapping("/articles/update")
-    public String update(ArticleForm form){
+    public String update(ArticleForm form) {
         log.info(form.toString());
 
         //1 , DTO -> ENTITY
@@ -117,19 +130,18 @@ public class ArticleController {
 //
         //2, ENTITY IS SAVE
         Article target = articleRepository.findById(articleEntity.getId()).orElse(null);
-        log.info("target        , DB 에서 원본데이터 가져오기   : {} " , target);
-        log.info("articleEntity , DB 에   수정할 데이터 넣기 전 : {} " , articleEntity);
+        log.info("target        , DB 에서 원본데이터 가져오기   : {} ", target);
+        log.info("articleEntity , DB 에   수정할 데이터 넣기 전 : {} ", articleEntity);
 
 
-        if (target != null){
+        if (target != null) {
 //        3, SAVEDATA -> UPDATE REDIRECT VIEW
-             articleRepository.save(articleEntity);
+            articleRepository.save(articleEntity);
         }
 
 //        4, 상세페이지로 이동한다 .
         return "redirect:/articles/" + articleEntity.getId();
     }
-
 
 
 }
