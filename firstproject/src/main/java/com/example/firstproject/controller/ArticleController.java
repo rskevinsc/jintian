@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,7 +24,7 @@ public class ArticleController {
 
 
     // 1. 샘플로 -> 테스트 데이터를 자동으로 입력 해보기
-    @GetMapping("/articles/inputData")
+    @GetMapping("/articles/inputdata") // url 에 대문자를 쓰지말거라
     public String createMethod() {
 //        ArticleForm form = new ArticleForm(1L, "하나", "하나 내용");
 //        log.info("DTO : " + form.toString());
@@ -141,6 +142,23 @@ public class ArticleController {
 
 //        4, 상세페이지로 이동한다 .
         return "redirect:/articles/" + articleEntity.getId();
+    }
+
+    @GetMapping("/articles/{id}/delete")
+    public String delete(@PathVariable Long id){
+        log.info("삭제 요청이 들어 왔습니다. ");
+
+//        1, 삭제대상을 가져온다
+//        , 그리고 그 대상을 삭제한다
+//        , 다음 결과 페이지로 리다이렉트 redirect 한다.
+
+        Article target = articleRepository.findById(id).orElse(null);
+
+        if (target != null){
+            articleRepository.delete(target);
+        }
+
+        return "redirect:/articles";
     }
 
 
